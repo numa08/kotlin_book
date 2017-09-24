@@ -24,7 +24,7 @@ public final class ApplicationInformationListViewModel extends BaseObservable {
     private OnClickListener onClickListener;
 
     private boolean isLoading;
-    boolean isVisible;
+    private boolean isVisible;
 
     private List<ApplicationInformation> applicationInformationList;
 
@@ -35,6 +35,10 @@ public final class ApplicationInformationListViewModel extends BaseObservable {
     @Bindable
     public boolean isLoading() {
         return isLoading;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
     }
 
     private void setLoading(boolean loading) {
