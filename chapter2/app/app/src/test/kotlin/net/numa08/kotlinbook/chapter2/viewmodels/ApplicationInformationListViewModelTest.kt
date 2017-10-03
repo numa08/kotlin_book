@@ -1,16 +1,20 @@
+@file:Suppress("FunctionName")
+
 package net.numa08.kotlinbook.chapter2.viewmodels
 
 import android.content.pm.ApplicationInfo
 import android.graphics.drawable.ColorDrawable
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
 import net.numa08.kotlinbook.chapter2.models.ApplicationInformation
+import net.numa08.kotlinbook.chapter2.models.ProcessInformation
 import net.numa08.kotlinbook.chapter2.repositories.ApplicationInformationRepository
+import net.numa08.kotlinbook.chapter2.repositories.ProcessInformationRepository
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -18,56 +22,66 @@ class ApplicationInformationListViewModelTest {
 
     @Test
     fun データが正しく読み込まれること() {
-        val mock = mock(ApplicationInformationRepository::class.java)
-        `when`(mock.findAllApplications(ArgumentMatchers.any())).then {
-            val cb = it.arguments[0] as ApplicationInformationRepository.FindAllApplicationsCallback
-            cb.onFindAllApplications(
-                    listOf(
-                            ApplicationInformation(
-                                    "label 1",
-                                    ColorDrawable(0),
-                                    "description",
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    "package1",
-                                    ApplicationInfo()
-                            ),
-                            ApplicationInformation(
-                                    "label 2",
-                                    ColorDrawable(0),
-                                    "description",
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    "package2",
-                                    ApplicationInfo()
-                            ),
-                            ApplicationInformation(
-                                    "label 3",
-                                    ColorDrawable(0),
-                                    "description",
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    "package3",
-                                    ApplicationInfo()
-                            )
+        val mockApplicationInformationRepository = mock<ApplicationInformationRepository> {
+            on { findAllApplications(any()) }.then {
+                val cb = it.getArgument<ApplicationInformationRepository.FindAllApplicationsCallback>(0)
+                cb.onFindAllApplications(
+                        listOf(
+                                ApplicationInformation(
+                                        "label 1",
+                                        ColorDrawable(0),
+                                        "description",
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        "package1",
+                                        ApplicationInfo()
+                                ),
+                                ApplicationInformation(
+                                        "label 2",
+                                        ColorDrawable(0),
+                                        "description",
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        "package2",
+                                        ApplicationInfo()
+                                ),
+                                ApplicationInformation(
+                                        "label 3",
+                                        ColorDrawable(0),
+                                        "description",
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        "package3",
+                                        ApplicationInfo()
+                                )
 
-                            )
-            )
+                        )
+                )
+            }
         }
-        val viewModel = ApplicationInformationListViewModel(mock)
+
+        val mockProcessInformationRepository = mock<ProcessInformationRepository> {
+            on { findProcessInformationByName(any(), any()) }.then {
+                val name = it.getArgument<String>(0)
+                val cb = it.getArgument<(ProcessInformation) -> Unit>(1)
+                cb(ProcessInformation.InActiveProcessInformation(name))
+            }
+        }
+        val viewModel = ApplicationInformationListViewModel(mockApplicationInformationRepository, mockProcessInformationRepository)
         viewModel.onCreate()
         viewModel.fetchApplication()
         assertThat("3件の情報が取得できていること", viewModel.applicationInformationList?.size, `is`(3))
+        assertThat("ロード状態が遷移していること", viewModel.isLoading, `is`(false))
     }
 
     @Test
-    fun isLoadingプロパティが遷移すること() {
+    fun データが空でもisLoadingプロパティが遷移すること() {
         val viewModel = ApplicationInformationListViewModel(object : ApplicationInformationRepository {
             override fun findAllApplications(callback: ApplicationInformationRepository.FindAllApplicationsCallback?) {
                 callback?.onFindAllApplications(emptyList())
@@ -75,6 +89,11 @@ class ApplicationInformationListViewModelTest {
 
             override fun findApplicationByPackageName(packageName: String?, callback: ApplicationInformationRepository.FindApplicationCallback?) {
                 fail("ここは呼ばれない")
+            }
+        }, object : ProcessInformationRepository {
+            override fun findProcessInformationByName(name: String, cb: (ProcessInformation) -> Unit) {
+                val info = ProcessInformation.InActiveProcessInformation(name)
+                cb(info)
             }
         })
         assertThat("初期状態ではロード中ではない", viewModel.isLoading, `is`(false))
@@ -87,7 +106,7 @@ class ApplicationInformationListViewModelTest {
 
     @Test
     fun isVisibleプロパティが遷移すること() {
-        val viewModel = ApplicationInformationListViewModel(null)
+        val viewModel = ApplicationInformationListViewModel(null, null)
         assertThat("初期状態では画面に表示されていない扱いとする", viewModel.isVisible, `is`(false))
         viewModel.onCreate()
         assertThat("画面表示は表示状態となる", viewModel.isVisible, `is`(true))

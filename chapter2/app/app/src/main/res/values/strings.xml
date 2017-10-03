@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Chapter2</string>
     <string name="transition_name_icon">icon</string>
+    <string name="description_inactive_row_view_nodel">起動していません</string>
+    <string name="description_active_row_view_model">起動中です</string>
+    <string name="description_active_row_v21_view_model">%sに起動しました</string>
+    <string name="dialog_usage_stats_access_title">使用履歴へのアクセスを許可してください</string>
+    <string name="dialog_usage_stats_access_message">設定画面を開き、アプリを有効にしてください</string>
+    <string name="dialog_usage_stats_access_positive">設定画面を開く</string>
 </resources>
