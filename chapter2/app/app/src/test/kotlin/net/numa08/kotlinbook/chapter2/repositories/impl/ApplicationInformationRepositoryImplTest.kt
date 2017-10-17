@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
+import kotlinx.coroutines.experimental.runBlocking
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
@@ -20,7 +21,7 @@ import org.robolectric.RobolectricTestRunner
 class ApplicationInformationRepositoryImplTest {
 
     @Test
-    fun 例外が発生したときにはアプリケーションの情報を取得できない() {
+    fun 例外が発生したときにはアプリケーションの情報を取得できない() = runBlocking {
         val packageManager = mock<PackageManager> {
             on(it.getApplicationInfo(any(), any()))
                     .thenThrow(PackageManager.NameNotFoundException())
@@ -62,7 +63,7 @@ class ApplicationInformationRepositoryImplTest {
     }
 
     @Test
-    fun flagがFLAG_SYSTEMのアプリケーション情報を取得しない() {
+    fun flagがFLAG_SYSTEMのアプリケーション情報を取得しない() = runBlocking {
         val mockList = listOf<ApplicationInfo>(
                 mock {
                     it.flags = ApplicationInfo.FLAG_SYSTEM

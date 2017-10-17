@@ -5,8 +5,8 @@ import android.app.ActivityManager
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import net.numa08.kotlinbook.chapter2.models.ProcessInformation
 import net.numa08.kotlinbook.chapter2.repositories.ProcessInformationRepository
 
@@ -25,12 +25,15 @@ class ProcessInformationRepositoryImpl(
     }
 
     override fun findProcessInformationByName(name: String, cb: (ProcessInformation) -> Unit) {
-        cb(findProcessInformationByName(name))
     }
 
-    private fun findProcessInformationByName(name: String): ProcessInformation {
+    private suspend fun findProcessInformationByName(name: String): ProcessInformation {
         activityManager.runningAppProcesses.find { it.processName == name } ?: return ProcessInformation.InActiveProcessInformation(name)
         return ProcessInformation.ActiveProcessInformation(name)
+    }
+
+    override fun findProcessInformationByNameAsync(name: String): Deferred<ProcessInformation> = async {
+        return@async findProcessInformationByName(name)
     }
 }
 
@@ -39,17 +42,15 @@ class ProcessInformationRepositoryImplV21(
         private val usageStatsManager: UsageStatsManager
 ): ProcessInformationRepository {
     override fun findProcessInformationByName(name: String, cb: (ProcessInformation) -> Unit) {
-        val callbackHandler = Handler(Looper.getMainLooper())
-        Thread{
-            val info = findProcessInformationByName(name)
-            callbackHandler.post {
-                cb(info)
-            }
-        }.start()
     }
 
-    private fun findProcessInformationByName(name: String): ProcessInformation {
+    private suspend fun findProcessInformationByName(name: String): ProcessInformation {
         val usageStats = usageStatsManager.queryAndAggregateUsageStats(0, System.currentTimeMillis())[name] ?: return ProcessInformation.InActiveProcessInformation(name)
         return ProcessInformation.ActiveProcessInformationV21(name, usageStats.lastTimeUsed)
     }
+
+    override fun findProcessInformationByNameAsync(name: String): Deferred<ProcessInformation> = async {
+        return@async findProcessInformationByName(name)
+    }
+
 }

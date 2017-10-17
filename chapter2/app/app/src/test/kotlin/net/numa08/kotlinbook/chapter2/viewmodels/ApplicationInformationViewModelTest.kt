@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo
 import android.graphics.drawable.ColorDrawable
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
+import kotlinx.coroutines.experimental.async
 import net.numa08.kotlinbook.chapter2.models.ApplicationInformation
 import net.numa08.kotlinbook.chapter2.repositories.ApplicationInformationRepository
 import org.hamcrest.core.Is.`is`
@@ -15,7 +16,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import java.util.function.Function
 
 
 @RunWith(RobolectricTestRunner::class)
@@ -47,10 +47,11 @@ class ApplicationInformationViewModelTest {
         )
 
         val mockApplicationInformationRepository = mock<ApplicationInformationRepository> {
-            on { findApplicationByPackageName(any(), any()) }.then {
-                val cb = it.getArgument<(ApplicationInformation?) -> Unit>(1)
-                cb.invoke(applicationInformation)
-            }
+            on { findApplicationByPackageNameAsync(any()) }.thenReturn(
+                    async {
+                        return@async applicationInformation
+                    }
+            )
         }
 
         val viewModel = ApplicationInformationViewModel(mockInjector(), mockApplicationInformationRepository)

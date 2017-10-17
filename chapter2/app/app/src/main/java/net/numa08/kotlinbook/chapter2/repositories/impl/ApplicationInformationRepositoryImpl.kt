@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.BitmapDrawable
-import android.os.Handler
-import android.os.Looper
 import android.support.annotation.VisibleForTesting
 import android.support.v7.graphics.Palette
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import net.numa08.kotlinbook.chapter2.models.ApplicationInformation
 import net.numa08.kotlinbook.chapter2.repositories.ApplicationInformationRepository
 import java.util.concurrent.Callable
@@ -18,25 +18,25 @@ class ApplicationInformationRepositoryImpl(private val packageManager: PackageMa
 
     @SuppressLint("VisibleForTests")
     override fun findAllApplications(cb: ((List<ApplicationInformation>) -> Unit)) {
-        val callbackHandler = Handler(Looper.myLooper())
-        Thread(Runnable {
-            val applications = findAllApplications()
-            callbackHandler.post { cb(applications) }
-        }).start()
 
     }
 
     @SuppressLint("VisibleForTests")
     override fun findApplicationByPackageName(packageName: String, cb: (ApplicationInformation?) -> Unit) {
-        val callbackHandler = Handler(Looper.myLooper())
-        Thread(Runnable {
-            val applicationInformation = findApplicationByPackageName(packageName)
-            callbackHandler.post { cb(applicationInformation) }
-        }).start()
+    }
+
+    @SuppressLint("VisibleForTests")
+    override fun findAllApplicationsAsync(): Deferred<List<ApplicationInformation>> = async {
+        return@async findAllApplications()
+    }
+
+    @SuppressLint("VisibleForTests")
+    override fun findApplicationByPackageNameAsync(packageName: String): Deferred<ApplicationInformation?> = async {
+        return@async findApplicationByPackageName(packageName)
     }
 
     @VisibleForTesting
-    fun findApplicationByPackageName(packageName: String): ApplicationInformation? {
+    suspend fun findApplicationByPackageName(packageName: String): ApplicationInformation? {
         return try {
             val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
             convertApplicationInfo(applicationInfo)
@@ -47,7 +47,7 @@ class ApplicationInformationRepositoryImpl(private val packageManager: PackageMa
     }
 
     @VisibleForTesting
-    fun findAllApplications(): List<ApplicationInformation> {
+    suspend fun findAllApplications(): List<ApplicationInformation> {
         val exec = Executors.newFixedThreadPool(5)
         val apps =
                 packageManager.getInstalledApplications(0)
