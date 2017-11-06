@@ -17,8 +17,11 @@ class CSVParser : Parser {
         val items = rows.drop(1)
                 .mapIndexed { index, s ->
                     val l = s.split(",")
-                    val id = l.getOrElse(0, { throw Parser.IllegalFormatException("${index + 1} に `id` がありません ") }).toLongOrThrow { "${index + 1} が数値ではありません: $it" }
-                    val name = l.getOrElse(1, { throw Parser.IllegalFormatException("${index + 1} に `name` がありません") })
+                    val id = l.getOrElse(0,
+                            { throw Parser.IllegalFormatException("${index + 1} に `id` がありません ") })
+                            .toLongOrThrow { "${index + 1} が数値ではありません: $it" }
+                    val name = l.getOrElse(1,
+                            { throw Parser.IllegalFormatException("${index + 1} に `name` がありません") })
                     val price = l.getOrNull(2)?.toLongOrNull()
                     Row.Item(id, name, price)
                 }
