@@ -32,6 +32,10 @@ public final class ApplicationInformationViewModel extends BaseObservable {
         this.applicationInformationRepository = applicationInformationRepository;
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
     @Nullable @Bindable
     public ApplicationInformation getApplicationInformation() {
         return applicationInformation;
