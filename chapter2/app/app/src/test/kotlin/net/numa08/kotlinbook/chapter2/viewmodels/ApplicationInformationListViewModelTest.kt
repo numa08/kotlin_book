@@ -106,7 +106,7 @@ class ApplicationInformationListViewModelTest {
 
     @Test
     fun isVisibleプロパティが遷移すること() {
-        val viewModel = ApplicationInformationListViewModel(null, null)
+        val viewModel = ApplicationInformationListViewModel(mock(), mock())
         assertThat("初期状態では画面に表示されていない扱いとする", viewModel.isVisible, `is`(false))
         viewModel.onCreate()
         assertThat("画面表示は表示状態となる", viewModel.isVisible, `is`(true))

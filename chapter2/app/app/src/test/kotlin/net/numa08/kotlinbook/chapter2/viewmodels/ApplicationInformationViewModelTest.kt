@@ -2,6 +2,7 @@
 
 package net.numa08.kotlinbook.chapter2.viewmodels
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.drawable.ColorDrawable
 import com.nhaarman.mockito_kotlin.any
@@ -60,8 +61,10 @@ class ApplicationInformationViewModelTest {
     }
 
     private fun mockInjector(): ApplicationInformationViewModel.Injector =
-            ApplicationInformationViewModel.Injector {
-                RuntimeEnvironment.application
+            object : ApplicationInformationViewModel.Injector {
+                override val context: Context
+                    get() = RuntimeEnvironment.application
+
             }
 
 }
