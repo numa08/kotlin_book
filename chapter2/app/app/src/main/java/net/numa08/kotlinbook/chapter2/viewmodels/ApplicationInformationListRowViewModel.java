@@ -23,6 +23,7 @@ public final class ApplicationInformationListRowViewModel extends BaseObservable
 
     public interface Injector {
         Context context();
+        long currentTimeMillis();
     }
 
     private final Injector injector;
@@ -72,7 +73,7 @@ public final class ApplicationInformationListRowViewModel extends BaseObservable
             return injector.context().getString(R.string.description_active_row_view_model);
         }
         if (processInformation instanceof ProcessInformation.ActiveProcessInformationV21) {
-            final CharSequence spanString = DateUtils.getRelativeTimeSpanString(((ProcessInformation.ActiveProcessInformationV21) processInformation).getLastStartupTime(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+            final CharSequence spanString = DateUtils.getRelativeTimeSpanString(((ProcessInformation.ActiveProcessInformationV21) processInformation).getLastStartupTime(), injector.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
             return injector.context().getString(R.string.description_active_row_v21_view_model, spanString);
         }
         throw new IllegalStateException("ここには来ない");

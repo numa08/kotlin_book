@@ -30,6 +30,7 @@ android {
             forkEvery = 4
         }
         unitTests.returnDefaultValues = true // (3)
+        unitTests.includeAndroidResources = true
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
