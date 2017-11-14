@@ -24,8 +24,8 @@ class ApplicationInformationListViewModelTest {
     fun データが正しく読み込まれること() {
         val mockApplicationInformationRepository = mock<ApplicationInformationRepository> {
             on { findAllApplications(any()) }.then {
-                val cb = it.getArgument<ApplicationInformationRepository.FindAllApplicationsCallback>(0)
-                cb.onFindAllApplications(
+                val cb = it.getArgument<((List<ApplicationInformation>) -> Unit)>(0)
+                cb(
                         listOf(
                                 ApplicationInformation(
                                         "label 1",
@@ -83,11 +83,11 @@ class ApplicationInformationListViewModelTest {
     @Test
     fun データが空でもisLoadingプロパティが遷移すること() {
         val viewModel = ApplicationInformationListViewModel(object : ApplicationInformationRepository {
-            override fun findAllApplications(callback: ApplicationInformationRepository.FindAllApplicationsCallback?) {
-                callback?.onFindAllApplications(emptyList())
+            override fun findAllApplications(cb: (List<ApplicationInformation>) -> Unit) {
+                cb(emptyList())
             }
 
-            override fun findApplicationByPackageName(packageName: String?, callback: ApplicationInformationRepository.FindApplicationCallback?) {
+            override fun findApplicationByPackageName(packageName: String, cb: (ApplicationInformation?) -> Unit) {
                 fail("ここは呼ばれない")
             }
         }, object : ProcessInformationRepository {

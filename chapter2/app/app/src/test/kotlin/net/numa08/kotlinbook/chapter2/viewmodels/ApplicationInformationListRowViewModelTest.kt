@@ -47,9 +47,8 @@ class ApplicationInformationListRowViewModelTest {
     fun アプリケーションの名前が得られること() {
         val viewModel =
                 ApplicationInformationListRowViewModel(mockInjector())
-        viewModel.setApplicationInformation(
-                ApplicationInformation(
-                        "label 1",
+        viewModel.applicationInformation = ApplicationInformation(
+                "label 1",
                         ColorDrawable(0),
                         "description",
                         0,
@@ -58,10 +57,11 @@ class ApplicationInformationListRowViewModelTest {
                         0,
                         "package1",
                         ApplicationInfo()
-                ))
+                )
         assertThat("セットされたアプリケーションの名前が得られる",
                 viewModel.label!!.toString(),
                 `is`("label 1"))
+
     }
 
     private fun mockInjector(): ApplicationInformationListRowViewModel.

@@ -50,13 +50,13 @@ class ApplicationInformationRepositoryImplTest {
         assertThat(applicationInformation.description,
                 `is`("description" as CharSequence))
         assertThat(applicationInformation.lightVibrantRGB,
-                `is`(0))
+                `is`(nullValue()))
         assertThat(applicationInformation.vibrantRGB,
-                `is`(0))
+                `is`(nullValue()))
         assertThat(applicationInformation.bodyTextColor,
-                `is`(0))
+                `is`(nullValue()))
         assertThat(applicationInformation.titleTextColor,
-                `is`(0))
+                `is`(nullValue()))
         assertThat(applicationInformation.packageName,
                 `is`("package"))
     }
@@ -83,7 +83,6 @@ class ApplicationInformationRepositoryImplTest {
                 }
         )
         val packageManager = mock<PackageManager> {
-
             on(it.getInstalledApplications(any())).thenReturn(mockList)
         }
         val applications =

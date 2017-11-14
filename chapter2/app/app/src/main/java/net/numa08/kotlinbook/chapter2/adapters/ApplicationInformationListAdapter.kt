@@ -61,7 +61,7 @@ class ApplicationInformationListAdapter : RecyclerView.Adapter<ApplicationInform
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.viewModel.setApplicationInformation(informationList[position].first)
+        holder.binding.viewModel.applicationInformation = informationList[position].first
         holder.binding.viewModel.setProcessInformation(informationList[position].second)
         holder.binding.viewModel.setOnClickListener {
             onItemClickListener?.invoke(holder.adapterPosition, holder.binding)

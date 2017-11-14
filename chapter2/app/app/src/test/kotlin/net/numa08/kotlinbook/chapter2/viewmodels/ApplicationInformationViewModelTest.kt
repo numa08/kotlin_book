@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import java.util.function.Function
 
 
 @RunWith(RobolectricTestRunner::class)
@@ -47,8 +48,8 @@ class ApplicationInformationViewModelTest {
 
         val mockApplicationInformationRepository = mock<ApplicationInformationRepository> {
             on { findApplicationByPackageName(any(), any()) }.then {
-                val cb = it.getArgument<ApplicationInformationRepository.FindApplicationCallback>(1)
-                cb.onFindApplication(applicationInformation)
+                val cb = it.getArgument<(ApplicationInformation?) -> Unit>(1)
+                cb.invoke(applicationInformation)
             }
         }
 
