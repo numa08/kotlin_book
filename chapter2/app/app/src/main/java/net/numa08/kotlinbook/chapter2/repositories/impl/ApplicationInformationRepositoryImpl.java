@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.graphics.Palette;
 
 import net.numa08.kotlinbook.chapter2.models.ApplicationInformation;
@@ -65,10 +66,11 @@ public class ApplicationInformationRepositoryImpl implements ApplicationInformat
         }).start();
     }
 
+    @VisibleForTesting
     @Nullable
-    private ApplicationInformation findApplicationByPackageName(String packgeName) {
+    ApplicationInformation findApplicationByPackageName(String packageName) {
         try {
-            final ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packgeName, 0);
+            final ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packageName, 0);
             return convertApplicationInfo(applicationInfo);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -76,7 +78,8 @@ public class ApplicationInformationRepositoryImpl implements ApplicationInformat
         }
     }
 
-    private List<ApplicationInformation> findAllApplications() {
+    @VisibleForTesting
+    List<ApplicationInformation> findAllApplications() {
         final ExecutorService exec = Executors.newFixedThreadPool(5);
         final List<Future<ApplicationInformation>> tasks = new ArrayList<>();
         final List<ApplicationInformation> apps = new ArrayList<>();
@@ -110,8 +113,9 @@ public class ApplicationInformationRepositoryImpl implements ApplicationInformat
         return apps;
     }
 
+    @VisibleForTesting
     @NonNull
-    private ApplicationInformation convertApplicationInfo(ApplicationInfo appInfo) {
+    ApplicationInformation convertApplicationInfo(ApplicationInfo appInfo) {
         final CharSequence label = appInfo.loadLabel(packageManager);
         final Drawable icon = appInfo.loadIcon(packageManager);
         final CharSequence description = appInfo.loadDescription(packageManager);
